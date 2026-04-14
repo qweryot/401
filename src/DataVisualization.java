@@ -20,6 +20,9 @@ public class DataVisualization extends JFrame {
 
         // 3. 初始化界面
         initUI();
+
+        // 4. 显示窗口
+        setVisible(true);
     }
 
     // 初始化数据
@@ -31,12 +34,13 @@ public class DataVisualization extends JFrame {
         data.add(30.0);
         data.add(40.0);
         data.add(50.0);
+        data.add(60.0);
     }
 
     // 数据分析：计算总和、平均值
     private void calculateData() {
         sum = 0;
-        for (int i = 0; i <= data.size(); i++) {  
+        for (int i = 0; i < data.size(); i++) {
             sum += data.get(i);
         }
         avg = sum / data.size();  // 平均值计算
@@ -65,29 +69,51 @@ public class DataVisualization extends JFrame {
             int width = getWidth();
             int height = getHeight();
             int padding = 50;
+            int bottomPadding = 100;
             int barWidth = 40;
 
             // 绘制标题
             g2d.setFont(new Font("微软雅黑", Font.BOLD, 20));
             g2d.drawString("月度销售数据可视化", width/2 - 120, 30);
 
-            // 绘制统计结果
+            // 绘制统计结果（底部文字，保留边距）
             g2d.setFont(new Font("微软雅黑", Font.PLAIN, 16));
-            g2d.drawString("数据总和：" + sum, padding, height - padding + 30);
-            g2d.drawString("平均值：" + String.format("%.2f", avg), padding + 200, height - padding + 30);
+            g2d.drawString("数据总和：" + sum, padding, height - 30);
+            g2d.drawString("平均值：" + String.format("%.2f", avg), padding + 200, height - 30);
 
             // 绘制坐标轴
-            g2d.drawLine(padding, padding, padding, height - padding);  // Y轴
-            g2d.drawLine(padding, height - padding, width - padding, height - padding);  // X轴
+            g2d.drawLine(padding, padding, padding, height - bottomPadding);  // Y轴
+            g2d.drawLine(padding, height - bottomPadding, width - padding, height - bottomPadding);  // X轴
+
+            // 绘制折线图
+            g2d.setColor(Color.RED);
+            int[] xPoints = new int[data.size()];
+            int[] yPoints = new int[data.size()];
+            for (int i = 0; i < data.size(); i++) {
+                int x = padding + 40 + i * (barWidth + 30) + barWidth / 2;
+                int h = (int) (data.get(i) * 5);
+                int y = height - bottomPadding - h;
+                xPoints[i] = x;
+                yPoints[i] = y;
+                // 绘制数据点
+                g2d.fillOval(x - 4, y - 4, 8, 8);
+                // 绘制月份标签（在X轴下方，不与底部文字重叠）
+                g2d.drawString((i + 1) + "月", x - 10, height - bottomPadding + 25);
+            }
+            // 绘制折线
+            g2d.drawPolyline(xPoints, yPoints, data.size());
 
             // 绘制柱状图
             g2d.setColor(Color.BLUE);
             for (int i = 0; i < data.size(); i++) {
-                int x = padding + 20 + i * (barWidth + 30);
-                int h = (int) (data.get(i) * 5);  // 数据放大5倍
-                int y = height - padding - h;
+                int x = padding + 40 + i * (barWidth + 30);
+                int h = (int) (data.get(i) * 5);
+                int y = height - bottomPadding - h;
                 g2d.fillRect(x, y, barWidth, h);
+                // 绘制数值标签
+                g2d.setColor(Color.BLACK);
                 g2d.drawString(data.get(i) + "", x + 10, y - 5);
+                g2d.setColor(Color.BLUE);
             }
         }
     }
