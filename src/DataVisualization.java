@@ -31,12 +31,13 @@ public class DataVisualization extends JFrame {
         data.add(30.0);
         data.add(40.0);
         data.add(50.0);
+        data.add(60.0);
     }
 
     // 数据分析：计算总和、平均值
     private void calculateData() {
         sum = 0;
-        for (int i = 0; i <= data.size(); i++) {  
+        for (int i = 0; i < data.size(); i++) {
             sum += data.get(i);
         }
         avg = sum / data.size();  // 平均值计算
@@ -52,6 +53,8 @@ public class DataVisualization extends JFrame {
         // 面板：绘制图表
         ChartPanel chartPanel = new ChartPanel();
         add(chartPanel);
+
+        setVisible(true);
     }
 
     // 图表绘制面板（折线图 + 柱状图）
@@ -64,8 +67,9 @@ public class DataVisualization extends JFrame {
 
             int width = getWidth();
             int height = getHeight();
-            int padding = 50;
+            int padding = 70;
             int barWidth = 40;
+            int bottomMargin = 8;
 
             // 绘制标题
             g2d.setFont(new Font("微软雅黑", Font.BOLD, 20));
@@ -73,8 +77,8 @@ public class DataVisualization extends JFrame {
 
             // 绘制统计结果
             g2d.setFont(new Font("微软雅黑", Font.PLAIN, 16));
-            g2d.drawString("数据总和：" + sum, padding, height - padding + 30);
-            g2d.drawString("平均值：" + String.format("%.2f", avg), padding + 200, height - padding + 30);
+            g2d.drawString("数据总和：" + sum, padding, height - bottomMargin);
+            g2d.drawString("平均值：" + String.format("%.2f", avg), padding + 200, height - bottomMargin);
 
             // 绘制坐标轴
             g2d.drawLine(padding, padding, padding, height - padding);  // Y轴
@@ -89,6 +93,36 @@ public class DataVisualization extends JFrame {
                 g2d.fillRect(x, y, barWidth, h);
                 g2d.drawString(data.get(i) + "", x + 10, y - 5);
             }
+
+            // 绘制折线图
+            g2d.setColor(Color.RED);
+            g2d.setStroke(new BasicStroke(3));
+            int[] xPoints = new int[data.size()];
+            int[] yPoints = new int[data.size()];
+            for (int i = 0; i < data.size(); i++) {
+                xPoints[i] = padding + 20 + i * (barWidth + 30) + barWidth / 2;
+                yPoints[i] = height - padding - (int) (data.get(i) * 5);
+                g2d.fillOval(xPoints[i] - 5, yPoints[i] - 5, 10, 10);
+            }
+            g2d.drawPolyline(xPoints, yPoints, data.size());
+
+            // 绘制X轴月份标签
+            g2d.setColor(Color.BLACK);
+            String[] months = {"1月", "2月", "3月", "4月", "5月", "6月"};
+            for (int i = 0; i < data.size(); i++) {
+                int x = padding + 20 + i * (barWidth + 30) + barWidth / 2;
+                g2d.drawString(months[i], x - 10, height - padding + 20);
+            }
+
+            // 图例
+            g2d.setColor(Color.BLUE);
+            g2d.fillRect(width - padding - 120, padding, 20, 15);
+            g2d.setColor(Color.BLACK);
+            g2d.drawString("柱状图", width - padding - 90, padding + 12);
+
+            g2d.setColor(Color.RED);
+            g2d.fillRect(width - padding - 120, padding + 25, 20, 3);
+            g2d.drawString("折线图", width - padding - 90, padding + 28);
         }
     }
 
